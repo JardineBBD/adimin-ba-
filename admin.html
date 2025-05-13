@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiSpace MU - ระบบจัดการการจองห้องแลป</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <!-- เพิ่ม Chart.js สำหรับการสร้างกราฟ -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-prompt">
+    <!-- Header -->
+    <header class="bg-blue-800 text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="Mahidol_U.png" alt="Logo" class="h-10 mr-3">
+                <h1 class="text-2xl font-bold">MultiSpace MU - ระบบจัดการ</h1>
+            </div>
+            <div class="flex items-center">
+                <span class="mr-4">เจ้าหน้าที่: สมพงษ์ รักดี</span>
+                <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                    ออกจากระบบ
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto py-8 px-4">
+        <!-- ส่วนสรุปข้อมูลสำคัญ (Dashboard) -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+            <!-- ห้องที่จองมากที่สุดเดือนนี้ -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500">
+                <h3 class="text-lg font-medium text-gray-500 mb-2">ห้องที่จองมากที่สุดเดือนนี้</h3>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-3xl font-bold text-blue-600" id="mostBookedRoom">CO101</p>
+                        <p class="text-sm text-gray-600" id="mostBookedRoomCount">20 ครั้ง</p>
+                    </div>
+                    <div class="bg-blue-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- สาขาวิชาที่จองมากที่สุดเดือนนี้ -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500">
+                <h3 class="text-lg font-medium text-gray-500 mb-2">สาขาที่จองมากที่สุดเดือนนี้</h3>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-3xl font-bold text-green-600" id="mostBookedDept">วิศวกรรมคอมพิวเตอร์</p>
+                        <p class="text-sm text-gray-600" id="mostBookedDeptCount">80 ครั้ง</p>
+                    </div>
+                    <div class="bg-green-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- จำนวนการจองที่รอการอนุมัติ -->
+            <div class="bg-white rounded-lg shadow-md p-6 border-l-4 border-yellow-500">
+                <h3 class="text-lg font-medium text-gray-500 mb-2">การจองที่รอการอนุมัติ</h3>
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-3xl font-bold text-yellow-600" id="pendingCount">5</p>
+                        <p class="text-sm text-gray-600">รายการ</p>
+                    </div>
+                    <div class="bg-yellow-100 rounded-full p-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ส่วนสถิติการใช้ห้อง -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">สถิติการใช้ห้องแลป (7 วันล่าสุด)</h2>
+                <div class="flex items-center space-x-4">
+                    <select id="departmentFilter" class="border rounded p-2">
+                        <option value="all">ทุกสาขาวิชา</option>
+                        <option value="วิศวกรรมโยธา">วิศวกรรมโยธา</option>
+                        <option value="วิศวกรรมอุตสาหการ">วิศวกรรมอุตสาหการ</option>
+                        <option value="วิศวกรรมเคมี">วิศวกรรมเคมี</option>
+                        <option value="วิศวกรรมชีวการแพทย์">วิศวกรรมชีวการแพทย์</option>
+                        <option value="วิศวกรรมเครื่องกล">วิศวกรรมเครื่องกล</option>
+                        <option value="วิศวกรรมคอมพิวเตอร์">วิศวกรรมคอมพิวเตอร์</option>
+                        <option value="วิศวกรรมไฟฟ้า">วิศวกรรมไฟฟ้า</option>
+                    </select>
+                    <button id="downloadStatsBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                        ดาวน์โหลด PDF
+                    </button>
+                </div>
+            </div>
+            <div style="height: 350px;" class="bg-gray-50 p-4 rounded-lg">
+                <canvas id="roomUsageChart"></canvas>
+            </div>
+        </div>
+
+        <!-- ส่วนรายการจองห้องแลป -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4">รายการจองห้องแลปรอการอนุมัติ</h2>
+            
+            <div class="mb-4 flex flex-wrap gap-4">
+                <div class="flex items-center">
+                    <span class="inline-block w-4 h-4 bg-yellow-200 rounded-full mr-2"></span>
+                    <span>รอการอนุมัติ</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="inline-block w-4 h-4 bg-green-200 rounded-full mr-2"></span>
+                    <span>อนุมัติแล้ว</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="inline-block w-4 h-4 bg-red-200 rounded-full mr-2"></span>
+                    <span>ปฏิเสธแล้ว</span>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-2 px-4 border-b text-left">สาขาวิชา</th>
+                            <th class="py-2 px-4 border-b text-left">ห้องแลป</th>
+                            <th class="py-2 px-4 border-b text-left">วันที่</th>
+                            <th class="py-2 px-4 border-b text-left">เวลา</th>
+                            <th class="py-2 px-4 border-b text-left">รหัสนักศึกษา</th>
+                            <th class="py-2 px-4 border-b text-left">วัตถุประสงค์</th>
+                            <th class="py-2 px-4 border-b text-center">การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookingTable">
+                        <!-- ข้อมูลการจองจะถูกเพิ่มด้วย JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal ปฏิเสธการจอง -->
+    <div id="rejectModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md w-full">
+            <h3 class="text-xl font-bold mb-4">ปฏิเสธการจอง</h3>
+            <p id="rejectBookingInfo" class="mb-4 text-gray-600">กรุณาระบุเหตุผลในการปฏิเสธการจอง</p>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">เหตุผล:</label>
+                <textarea 
+                    id="rejectReason"
+                    class="w-full p-2 border rounded" 
+                    rows="3"
+                    placeholder="ระบุเหตุผลในการปฏิเสธการจอง"
+                ></textarea>
+            </div>
+            
+            <div class="flex justify-end space-x-4">
+                <button 
+                    id="cancelRejectBtn"
+                    class="bg-gray-300 hover:bg-gray-400 text-black font-bold py-2 px-4 rounded"
+                >
+                    ยกเลิก
+                </button>
+                <button 
+                    id="confirmRejectBtn"
+                    class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                >
+                    ยืนยันการปฏิเสธ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ข้อมูลการจองตัวอย่าง
+        const bookings = [
+            {
+                id: 1,
+                department: 'วิศวกรรมอุตสาหการ',
+                lab: 'IE101',
+                date: '2023-05-15',
+                time: '10:00-11:00',
+                studentId: '6313078',
+                purpose: 'ทำการทดลองการดึงพลาสติก',
+                status: 'pending' // pending, approved, rejected
+            },
+            {
+                id: 2,
+                department: 'วิศวกรรมไฟฟ้า',
+                lab: 'EE103',
+                date: '2023-05-16',
+                time: '13:00-14:00',
+                studentId: '6312345',
+                purpose: 'ทดสอบวงจรไฟฟ้ากระแสสลับ',
+                status: 'pending'
+            },
+            {
+                id: 3,
+                department: 'วิศวกรรมเคมี',
+                lab: 'CHE102',
+                date: '2023-05-16',
+                time: '09:00-10:00',
+                studentId: '6311234',
+                purpose: 'ทำการทดลองการกลั่นน้ำมัน',
+                status: 'pending'
+            },
+            {
+                id: 4,
+                department: 'วิศวกรรมคอมพิวเตอร์',
+                lab: 'CO105',
+                date: '2023-05-17',
+                time: '14:00-15:00',
+                studentId: '6310987',
+                purpose: 'ทดสอบระบบความปลอดภัยเครือข่าย',
+                status: 'pending'
+            },
+            {
+                id: 5,
+                department: 'วิศวกรรมโยธา',
+                lab: 'CE104',
+                date: '2023-05-18',
+                time: '11:00-12:00',
+                studentId: '6309876',
+                purpose: 'ทดสอบความแข็งแรงของคอนกรีต',
+                status: 'pending'
+            }
+        ];
+
+        // ข้อมูลตัวอย่างสำหรับสถิติการใช้ห้องในรอบ 7 วัน
+        const usageStats = [
+            { lab: 'CE101', count: 12, department: 'วิศวกรรมโยธา' },
+            { lab: 'CE102', count: 8, department: 'วิศวกรรมโยธา' },
+            { lab: 'CE103', count: 15, department: 'วิศวกรรมโยธา' },
+            { lab: 'CE104', count: 10, department: 'วิศวกรรมโยธา' },
+            { lab: 'CE105', count: 7, department: 'วิศวกรรมโยธา' },
+            { lab: 'IE101', count: 18, department: 'วิศวกรรมอุตสาหการ' },
+            { lab: 'IE102', count: 14, department: 'วิศวกรรมอุตสาหการ' },
+            { lab: 'IE103', count: 9, department: 'วิศวกรรมอุตสาหการ' },
+            { lab: 'IE104', count: 11, department: 'วิศวกรรมอุตสาหการ' },
+            { lab: 'IE105', count: 16, department: 'วิศวกรรมอุตสาหการ' },
+            { lab: 'CHE101', count: 6, department: 'วิศวกรรมเคมี' },
+            { lab: 'CHE102', count: 13, department: 'วิศวกรรมเคมี' },
+            { lab: 'CHE103', count: 9, department: 'วิศวกรรมเคมี' },
+            { lab: 'CHE104', count: 7, department: 'วิศวกรรมเคมี' },
+            { lab: 'CHE105', count: 5, department: 'วิศวกรรมเคมี' },
+            { lab: 'BME101', count: 8, department: 'วิศวกรรมชีวการแพทย์' },
+            { lab: 'BME102', count: 11, department: 'วิศวกรรมชีวการแพทย์' },
+            { lab: 'BME103', count: 6, department: 'วิศวกรรมชีวการแพทย์' },
+            { lab: 'BME104', count: 9, department: 'วิศวกรรมชีวการแพทย์' },
+            { lab: 'BME105', count: 4, department: 'วิศวกรรมชีวการแพทย์' },
+            { lab: 'ME101', count: 15, department: 'วิศวกรรมเครื่องกล' },
+            { lab: 'ME102', count: 12, department: 'วิศวกรรมเครื่องกล' },
+            { lab: 'ME103', count: 17, department: 'วิศวกรรมเครื่องกล' },
+            { lab: 'ME104', count: 10, department: 'วิศวกรรมเครื่องกล' },
+            { lab: 'ME105', count: 8, department: 'วิศวกรรมเครื่องกล' },
+            { lab: 'CO101', count: 20, department: 'วิศวกรรมคอมพิวเตอร์' },
+            { lab: 'CO102', count: 16, department: 'วิศวกรรมคอมพิวเตอร์' },
+            { lab: 'CO103', count: 18, department: 'วิศวกรรมคอมพิวเตอร์' },
+            { lab: 'CO104', count: 12, department: 'วิศวกรรมคอมพิวเตอร์' },
+            { lab: 'CO105', count: 14, department: 'วิศวกรรมคอมพิวเตอร์' },
+            { lab: 'EE101', count: 13, department: 'วิศวกรรมไฟฟ้า' },
+            { lab: 'EE102', count: 11, department: 'วิศวกรรมไฟฟ้า' },
+            { lab: 'EE103', count: 15, department: 'วิศวกรรมไฟฟ้า' },
+            { lab: 'EE104', count: 9, department: 'วิศวกรรมไฟฟ้า' },
+            { lab: 'EE105', count: 7, department: 'วิศวกรรมไฟฟ้า' }
+        ];
+
+        let selectedBookingId = null;
+        let roomUsageChart = null;
+
+        // คำนวณสถิติสำหรับ Dashboard
+        function calculateDashboardStats() {
+            // ค้นหาห้องที่จองมากที่สุด
+            const sortedRooms = [...usageStats].sort((a, b) => b.count - a.count);
+            const topRoom = sortedRooms[0];
+            
+            document.getElementById('mostBookedRoom').textContent = topRoom.lab;
+            document.getElementById('mostBookedRoomCount').textContent = `${topRoom.count} ครั้ง`;
+            
+            // คำนวณจำนวนการจองตามสาขาวิชา
+            const departmentCounts = {};
+            
+            usageStats.forEach(item => {
+                if (!departmentCounts[item.department]) {
+                    departmentCounts[item.department] = 0;
+                }
+                departmentCounts[item.department] += item.count;
+            });
+            
+            // หาสาขาที่จองมากที่สุด
+            let maxDeptCount = 0;
+            let maxDeptName = '';
+            
+            for (const dept in departmentCounts) {
+                if (departmentCounts[dept] > maxDeptCount) {
+                    maxDeptCount = departmentCounts[dept];
+                    maxDeptName = dept;
+                }
+            }
+            
+            document.getElementById('mostBookedDept').textContent = maxDeptName;
+            document.getElementById('mostBookedDeptCount').textContent = `${maxDeptCount} ครั้ง`;
+            
+            // นับจำนวนการจองที่รอการอนุมัติ
+            const pendingCount = bookings.filter(booking => booking.status === 'pending').length;
+            document.getElementById('pendingCount').textContent = pendingCount;
+        }
+
+        // แสดงกราฟสถิติการใช้ห้อง
+        function renderRoomUsageChart(department = 'all') {
+            const canvas = document.getElementById('roomUsageChart');
+            const ctx = canvas.getContext('2d');
+            
+            // ถ้ามีกราฟอยู่แล้ว ให้ทำลายก่อนสร้างใหม่
+            if (roomUsageChart) {
+                roomUsageChart.destroy();
+            }
+            
+            // กรองข้อมูลตามสาขาวิชาที่เลือก
+            const filteredData = department === 'all' 
+                ? usageStats 
+                : usageStats.filter(item => item.department === department);
+            
+            // เรียงลำดับตามจำนวนการใช้งานจากมากไปน้อย
+            filteredData.sort((a, b) => b.count - a.count);
+            
+            // ถ้ามีมากกว่า 15 รายการ ให้แสดงเฉพาะ 15 รายการแรก
+            const topData = filteredData.slice(0, 15);
+            
+            // เตรียมข้อมูลสำหรับกราฟ
+            const labels = topData.map(item => item.lab);
+            const data = topData.map(item => item.count);
+            
+            // สีสำหรับแท่งกราฟ แยกตามสาขาวิชา
+            const backgroundColors = topData.map(item => {
+                switch(item.department) {
+                    case 'วิศวกรรมโยธา': return 'rgba(54, 162, 235, 0.7)';
+                    case 'วิศวกรรมอุตสาหการ': return 'rgba(255, 99, 132, 0.7)';
+                    case 'วิศวกรรมเคมี': return 'rgba(75, 192, 192, 0.7)';
+                    case 'วิศวกรรมชีวการแพทย์': return 'rgba(153, 102, 255, 0.7)';
+                    case 'วิศวกรรมเครื่องกล': return 'rgba(255, 159, 64, 0.7)';
+                    case 'วิศวกรรมคอมพิวเตอร์': return 'rgba(255, 205, 86, 0.7)';
+                    case 'วิศวกรรมไฟฟ้า': return 'rgba(201, 203, 207, 0.7)';
+                    default: return 'rgba(54, 162, 235, 0.7)';
+                }
+            });
+            
+            // สร้างกราฟ
+            roomUsageChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'จำนวนครั้งที่ใช้งาน (7 วันล่าสุด)',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'จำนวนครั้ง'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'ห้องแลป'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: department === 'all' ? 'สถิติการใช้ห้องแลปทั้งหมด 7 วันล่าสุด' : `สถิติการใช้ห้องแลป${department} 7 วันล่าสุด`,
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    return `สาขา: ${topData[index].department}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // แสดงรายการจอง
+        function renderBookings() {
+            const tableBody = document.getElementById('bookingTable');
+            tableBody.innerHTML = '';
+            
+            bookings.forEach(booking => {
+                const row = document.createElement('tr');
+                
+                // เพิ่มสีพื้นหลังตามสถานะ
+                if (booking.status === 'approved') {
+                    row.classList.add('bg-green-100');
+                } else if (booking.status === 'rejected') {
+                    row.classList.add('bg-red-100');
+                } else {
+                    row.classList.add('bg-yellow-50');
+                }
+                
+                row.innerHTML = `
+                    <td class="py-3 px-4 border-b">${booking.department}</td>
+                    <td class="py-3 px-4 border-b">${booking.lab}</td>
+                    <td class="py-3 px-4 border-b">${formatDate(booking.date)}</td>
+                    <td class="py-3 px-4 border-b">${booking.time}</td>
+                    <td class="py-3 px-4 border-b">${booking.studentId}</td>
+                    <td class="py-3 px-4 border-b">${booking.purpose}</td>
+                    <td class="py-3 px-4 border-b">
+                        <div class="flex justify-center space-x-2">
+                            ${booking.status === 'pending' ? `
+                                <button 
+                                    class="bg-green-500 hover:bg-green-600 text-white py-1 px-3 rounded approve-btn"
+                                    data-id="${booking.id}"
+                                >
+                                    อนุมัติ
+                                </button>
+                                <button 
+                                    class="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded reject-btn"
+                                    data-id="${booking.id}"
+                                >
+                                    ปฏิเสธ
+                                </button>
+                            ` : booking.status === 'approved' ? `
+                                <span class="text-green-700 font-medium">อนุมัติแล้ว</span>
+                            ` : `
+                                <span class="text-red-700 font-medium">ปฏิเสธแล้ว</span>
+                            `}
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // เพิ่ม event listeners ให้กับปุ่มอนุมัติและปฏิเสธ
+            document.querySelectorAll('.approve-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bookingId = parseInt(this.getAttribute('data-id'));
+                    approveBooking(bookingId);
+                });
+            });
+            
+            document.querySelectorAll('.reject-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const bookingId = parseInt(this.getAttribute('data-id'));
+                    openRejectModal(bookingId);
+                });
+            });
+        }
+
+        // อนุมัติการจอง
+        function approveBooking(bookingId) {
+            const booking = bookings.find(b => b.id === bookingId);
+            if (booking) {
+                booking.status = 'approved';
+                renderBookings();
+                // อัปเดตสถิติบน Dashboard
+                calculateDashboardStats();
+                alert(`อนุมัติการจองห้อง ${booking.lab} สำเร็จ!`);
+            }
+        }
+
+        // เปิด modal ปฏิเสธการจอง
+        function openRejectModal(bookingId) {
+            selectedBookingId = bookingId;
+            const booking = bookings.find(b => b.id === bookingId);
+            
+            if (booking) {
+                document.getElementById('rejectBookingInfo').textContent = 
+                    `กรุณาระบุเหตุผลในการปฏิเสธการจองห้อง ${booking.lab} สาขา${booking.department}`;
+                document.getElementById('rejectModal').classList.remove('hidden');
+                document.getElementById('rejectModal').classList.add('flex');
+                document.getElementById('rejectReason').value = '';
+            }
+        }
+
+        // ปิด modal ปฏิเสธการจอง
+        function closeRejectModal() {
+            document.getElementById('rejectModal').classList.add('hidden');
+            document.getElementById('rejectModal').classList.remove('flex');
+            selectedBookingId = null;
+        }
+
+        // ยืนยันการปฏิเสธการจอง
+        function confirmReject() {
+            const reason = document.getElementById('rejectReason').value;
+            
+            if (!reason) {
+                alert('กรุณาระบุเหตุผลในการปฏิเสธการจอง');
+                return;
+            }
+            
+            const booking = bookings.find(b => b.id === selectedBookingId);
+            if (booking) {
+                booking.status = 'rejected';
+                booking.rejectReason = reason;
+                renderBookings();
+                // อัปเดตสถิติบน Dashboard
+                calculateDashboardStats();
+                closeRejectModal();
+                alert(`ปฏิเสธการจองห้อง ${booking.lab} สำเร็จ!`);
+            }
+        }
+
+        // แปลงรูปแบบวันที่
+        function formatDate(dateString) {
+            const [year, month, day] = dateString.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        // จำลองการดาวน์โหลด PDF
+        function downloadStatsPDF() {
+            alert('กำลังดาวน์โหลดรายงานสถิติการใช้ห้องแลปในรูปแบบ PDF');
+            // ในระบบจริงควรใช้ไลบรารีเช่น jsPDF เพื่อสร้างไฟล์ PDF จริงๆ
+        }
+
+        // เมื่อหน้าเว็บโหลดเสร็จ
+        document.addEventListener('DOMContentLoaded', function() {
+            // คำนวณและแสดงสถิติบน Dashboard
+            calculateDashboardStats();
+            
+            // แสดงกราฟสถิติการใช้ห้อง
+            renderRoomUsageChart();
+            
+            // แสดงรายการจอง
+            renderBookings();
+            
+            // ปุ่มยกเลิกการปฏิเสธ
+            document.getElementById('cancelRejectBtn').addEventListener('click', closeRejectModal);
+            
+            // ปุ่มยืนยันการปฏิเสธ
+            document.getElementById('confirmRejectBtn').addEventListener('click', confirmReject);
+            
+            // กรองกราฟตามสาขาวิชา
+            document.getElementById('departmentFilter').addEventListener('change', function() {
+                renderRoomUsageChart(this.value);
+            });
+            
+            // ปุ่มดาวน์โหลด PDF
+            document.getElementById('downloadStatsBtn').addEventListener('click', downloadStatsPDF);
+            
+            // ปุ่มออกจากระบบ
+            document.getElementById('logoutBtn').addEventListener('click', function() {
+                alert('กำลังออกจากระบบ');
+                // ในระบบจริงควรเปลี่ยนไปที่หน้า login
+                // window.location.href = 'index.html';
+            });
+        });
+    </script>
+</body>
+</html>
